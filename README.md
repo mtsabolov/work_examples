@@ -14,4 +14,4 @@ Use Case и примеры диаграмм для задачи "Автомат�
 
 ### iMoney
 Прототип мобильного приложения для отслеживания личных финансов. Открывается в сервисе Figma.
-Работу интерактивных кнопок "Сегодня" и "Баланс" можно посмотреть по ссылке: [iMoney_prototype] (https://www.figma.com/proto/DAiIDSZZuSUOgse1Ml6qPH/iMoney?page-id=0%3A1&node-id=2%3A2&viewport=241%2C48%2C0.8&scaling=scale-down&starting-point-node-id=2%3A2)
+Работу интерактивных кнопок "Сегодня" и "Баланс" можно посмотреть по ссылке: [iMoney_prototype](https://www.figma.com/proto/DAiIDSZZuSUOgse1Ml6qPH/iMoney?page-id=0%3A1&node-id=2%3A2&viewport=241%2C48%2C0.8&scaling=scale-down&starting-point-node-id=2%3A2)
