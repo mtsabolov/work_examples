@@ -1,6 +1,3 @@
--- Примеры запросов с использованием базы данных "bookings"
-
--- База данных: https://edu.postgrespro.ru/bookings.pdf
 
 --2.1 В каких городах больше одного аэропорта?
 select city, count(city) 
@@ -14,7 +11,7 @@ select aircraft_code, departure_airport, model, "range"
 from flights f 
 join aircrafts a using(aircraft_code)
 where "range" = (select max("range") from aircrafts a)
-group by f.departure_airport, f.aircraft_code, a.model, "a.range";
+group by f.departure_airport, f.aircraft_code, a.model, a."range";
 /* из таблицы aircrafts получаем данные о самолете с максимальной дальностью полёта, по коду самолёта (aircraft_code)
  * объединяем с таблицей flights, где есть информация об аэропортах, из которых самолёт с таким кодом выполняет рейсы,
  * по условию максимальной дальности перелёта отфильтровываем. Затем по аэропортам группируем, чтобы видеть только уникальные значения
@@ -28,7 +25,7 @@ where actual_departure is not null --убираем отображение ре�
 order by delay desc --сортируем по времени задержки от наибольшего к наименьшему
 limit 10 --ограничиваем показ первыми десятью
 
---2.4 Были ли брони, по которым не были получены посадочные талоны?
+--2.4 Показать брони, по которым не были получены посадочные талоны?
 select book_ref, ticket_no, boarding_no
 from tickets t 
 left join boarding_passes bp using(ticket_no)
@@ -37,26 +34,26 @@ where boarding_no is null
   в таблице boarding_passes есть номер билета - ticket_no и номер посадочного талона - boarding_no
   LEFT JOIN по номеру билета объединит брони и их посадочные.
   если у брони нет соответствующего посадочного - в столбце boarding_no выведен NULL,
-  значит брони, по которым не были получены посадочные, есть */
+  значит по ней не были получены посадочные */
 
--- 2.5 uncomplete	
+-- 2.5 Найти свободные места для каждого рейса, их % отношение к общему количеству мест в самолете
 with ts as (
-	select fv.flight_id, fv.flight_no, fv.scheduled_departure_local, fv.departure_city, fv.arrival_city, fv.aircraft_code, 
+	select fv.flight_id, fv.flight_no, fv.actual_departure_local, fv.departure_city, fv.departure_airport, fv.arrival_city, fv.aircraft_code, 
 		count(tf.ticket_no) as fact_passengers,
 		(select count(s.seat_no)
 			from seats s
 			where s.aircraft_code = fv.aircraft_code) as total_seats
 	from flights_v fv 
 	join ticket_flights tf on fv.flight_id = tf.flight_id 
-	where fv.status = 'Departed'
-	group by 1, 2, 3, 4, 5, 6
+	where fv.actual_departure_local is not null 
+	group by 1, 2, 3, 4, 5, 6, 7
 )
-select ts.flight_id, ts.flight_no, ts.scheduled_departure_local, ts.departure_city, ts.fact_passengers, ts.total_seats,
+select ts.flight_id, ts.flight_no, ts.actual_departure_local, ts.departure_city, ts.departure_airport, ts.arrival_city, ts.fact_passengers, ts.total_seats,
 	(ts.total_seats::numeric - ts.fact_passengers::numeric) as free_seats,
 	round((total_seats::numeric - fact_passengers::numeric) / ts.total_seats::numeric, 2) * 100 as percentage
 from ts 
 join aircrafts as a on ts.aircraft_code = a.aircraft_code
-order by ts.scheduled_departure_local
+order by ts.actual_departure_local
 
 
 
